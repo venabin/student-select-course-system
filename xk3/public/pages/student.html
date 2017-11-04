@@ -1,0 +1,146 @@
+<div id="app">
+		<el-tabs v-model="activeName">
+		    <el-tab-pane label="档案信息" name="first"></el-tab-pane>
+		    <el-tab-pane label="成绩信息" name="second">成绩信息</el-tab-pane>
+		    <el-tab-pane label="角色信息" name="third">角色信息</el-tab-pane>
+		</el-tabs>
+		<el-input
+		  placeholder="输入关键字"
+		  icon="search"
+		  v-model="key"
+		  :on-icon-click="handleIconClick" style="width: 200px;margin: 3px 0;">
+		</el-input>
+		<el-button @click="toSaveone" type="text">单个录入</el-button>
+		<el-button type="text">批量录入</el-button>
+		<el-table
+	      :data="studentData"
+	      style="width: 100%">
+	      <el-table-column
+	        prop="name"
+	        label="姓名"
+	        width="180">
+	      </el-table-column>
+	      <el-table-column
+	        prop="gender"
+	        label="性别"
+	        width="180">
+	      </el-table-column>
+	      <el-table-column
+	        prop="birth"
+	        label="生日">
+	      </el-table-column>
+	      <el-table-column label="操作">
+		      <template scope="scope">
+		        <el-button
+		          size="small"
+		          @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+		        <el-button
+		          size="small"
+		          type="danger"
+		          @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+		      </template>
+	      </el-table-column>
+	    </el-table>
+
+	    <el-dialog :title="dialogTitle" :visible.sync="dialogFormVisible">
+		  <el-form :model="form" :key="form.name">
+		    <el-form-item label="姓名">
+		      <el-input v-model="form.name" auto-complete="off"></el-input>
+		    </el-form-item>
+		    <el-form-item label="性别">
+		      <el-radio class="radio" v-model="form.gender" label="男">男</el-radio>
+  			  <el-radio class="radio" v-model="form.gender" label="女">女</el-radio>
+		    </el-form-item>
+		  </el-form>
+		  <span slot="footer" class="dialog-footer">
+		    <el-button @click="dialogFormVisible = false">取消</el-button>
+		    <el-button type="primary" @click="submit">确定</el-button>
+		  </span>
+		</el-dialog>
+	</div>
+	<script>
+		new Vue({
+			el:'#app',
+			data:{
+				studentData:null,
+				dialogTitle:'',
+				dialogFormVisible:false,
+				form:{},
+				activeName:'first',
+				key:''
+			},
+			created:function(){
+				vm=this;
+				$.getJSON('http://localhost:3000/student/findAll',function(data){
+					vm.studentData=data;
+				});
+			},
+			methods:{
+				toSaveone:function(){
+					this.form={gender:'女'};
+					vm.dialogFormVisible=true;
+					this.dialogTitle='录入学生信息';
+				},
+				submit:function(){
+					this.form.birth='1990-01-01 01:01:01';
+					// this.form.class_id=1;
+					if(!this.form.class_id){
+						this.form.class_id=1;
+					}
+					if(this.dialogTitle=='录入学生信息'){
+						this.form.password='123321';
+						var url='http://localhost:3000/student/save';
+					}else if(this.dialogTitle=='修改学生信息'){
+						url='http://localhost:3000/student/update';
+					}
+					$.post(url,this.form,function(data){
+						vm.dialogFormVisible=false;
+						if(data.code){
+							vm.$message({
+					            type: 'success',
+					            message: '操作失败!失败代号:'+data.code
+					        });
+						}else{
+							$.getJSON('http://localhost:3000/student/findAll',function(data){
+								vm.studentData=data;
+							});
+							vm.$message({
+					            type: 'success',
+					            message: '操作成功!'
+					        });
+						}
+					});
+				},
+				handleEdit:function(index,row){
+					this.dialogTitle='修改学生信息';
+					this.dialogFormVisible=true;
+					this.form=row;
+				},
+				handleDelete:function(index,row){
+					this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
+			          confirmButtonText: '确定',
+			          cancelButtonText: '取消',
+			          type: 'warning'
+			        }).then(() => {
+			        	var url='http://localhost:3000/student/batchDelete';
+						$.post(url,{
+							ids:JSON.stringify([row.id])
+						},function(data){
+							$.getJSON('http://localhost:3000/student/findAll',function(data){
+								vm.studentData=data;
+							});
+							vm.$message({
+					            type: 'success',
+					            message: '操作成功!'
+					        });
+						})
+			        }).catch(() => {
+			          this.$message({
+			            type: 'info',
+			            message: '已取消操作'
+			          });          
+			        });
+				}
+			}
+		})
+	</script>

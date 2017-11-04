@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>组件库的应用</title>
+	<script src="./js/vue.js"></script>
+	<script src="./js/element-ui.js"></script>
+	<script src="./js/jquery-3.0.0.min.js"></script>
+	<link rel="stylesheet" href="./css/element-ui.css">
+	<style>
+		*{
+			margin: 0;
+			padding: 0;
+		}
+		/*header{
+			width: 100%;
+			background-color: #324057;
+		}
+		header h1{
+			line-height: 100px;
+			color: #D3DCE6;
+			padding-left: 50px;
+		}*/
+		.left{
+			width: 18%;
+			height: 500px;
+			background-color: #324057;
+			padding-top: 20px;
+			margin-right: 10px;
+			float: left;
+		}
+		.left ul{
+			list-style: none;
+			text-align: center;
+		}
+		.left ul a{
+			text-decoration: none;
+			font-size: 22px;
+			color: #D3DCE6;
+			line-height: 40px;
+		}
+		.left ul a:hover{
+			color: #1D8CE0;
+		}
+		.right{
+			float: left;
+			width: 70%;
+		}
+	</style>
+	<script>
+		$(function(){
+			$(".left").on("click","li",function(){
+				// alert($(this).attr("p"));
+				$(".right").load($(this).attr("p"));
+			});
+			$('.left li[p="pages/course.html"]').trigger("click");
+		})
+	</script>
+</head>
+<body>
+	<!-- <header>
+		<h1>学生选课系统</h1>
+	</header> -->
+	<div class="left">
+		<ul>
+			<li p="pages/student.html"><a href="javascript:void(0)" class="el-icon-menu">学生管理</a></li>
+			<li p="pages/course.html"><a href="javascript:void(0)" class="el-icon-setting">课程管理</a></li>
+			<li p="pages/class.html"><a href="javascript:void(0)" class="el-icon-date">班级管理</a></li>
+			<li p="pages/selectcourse.html"><a href="javascript:void(0)" class="el-icon-upload">选课管理</a></li>
+		</ul>
+	</div>
+	<div class="right"></div>
+</body>
+</html>

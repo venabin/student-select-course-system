@@ -1,0 +1,88 @@
+<div id="app">
+	<el-tabs v-model="activeName">
+	    <el-tab-pane label="课程信息" name="first"></el-tab-pane>
+	    <el-tab-pane label="任课信息" name="second">任课信息</el-tab-pane>
+	</el-tabs>
+	<el-input
+		  placeholder="输入关键字"
+		  icon="search"
+		  v-model="key"
+		  :on-icon-click="handleIconClick" style="width: 200px;margin: 3px 0;">
+	</el-input>
+	<el-button @click="toSaveone" type="text">单个录入</el-button>
+	<el-button type="text">批量录入</el-button>
+	<el-table
+      :data="courseData"
+      style="width: 100%">
+      <el-table-column
+        prop="id"
+        label="编号"
+        width="180">
+      </el-table-column>
+      <el-table-column
+        prop="name"
+        label="课程名称"
+        width="180">
+      </el-table-column>
+      <el-table-column
+        prop="credit"
+        label="学分">
+      </el-table-column>
+      <el-table-column label="操作">
+	      <template scope="scope">
+	        <el-button
+	          size="small"
+	          @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+	        <el-button
+	          size="small"
+	          type="danger"
+	          @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+	      </template>
+      </el-table-column>
+    </el-table>
+
+    <el-dialog :title="dialogTitle" :visible.sync="dialogFormVisible">
+	  <el-form :model="form" :key="form.name">
+	    <el-form-item label="课程名称">
+	      <el-input v-model="form.name" auto-complete="off"></el-input>
+	    </el-form-item>
+	    <el-form-item label="学分">
+	      <el-input-number v-model="form.credit" :min="1" :max="5"></el-input-number>
+	    </el-form-item>
+	  </el-form>
+	  <span slot="footer" class="dialog-footer">
+	    <el-button @click="dialogFormVisible = false">取消</el-button>
+	    <el-button type="primary" @click="submit">确定</el-button>
+	  </span>
+	</el-dialog>
+</div>
+<script>
+	new Vue({
+		el:'#app',
+		data:{
+			courseData:null,
+			dialogTitle:'',
+			dialogFormVisible:false,
+			form:{},
+			activeName:'first',
+		},
+		created:function(){
+			vm=this;
+			$.getJSON('http://localhost:3000/course/findAll',function(data){
+				vm.courseData=data;
+			});
+		},
+		methods:{
+			handleEdit:function(index,row){
+				this.dialogTitle='修改课程信息';
+				this.dialogFormVisible=true;
+				this.form=row;
+			},
+			handleDelete:function(index,row){
+				this.dialogTitle='删除课程信息';
+				this.dialogFormVisible=true;
+				this.form=row;
+			},
+		}
+	})
+</script>
